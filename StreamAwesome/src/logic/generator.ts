@@ -9,6 +9,7 @@ import { FontAwesomeIconType } from '@/model/fontAwesomeIconType'
 import { fontAwesomeVersionInfo } from '@/model/versions'
 import chroma from 'chroma-js'
 import namer from 'color-namer'
+import tinygradient from 'tinygradient'
 
 export default class IconGenerator {
   private renderingContext: CanvasRenderingContext2D
@@ -67,6 +68,18 @@ export default class IconGenerator {
 
   private fillBackground(backgroundColor: string): void {
     this.renderingContext.fillStyle = backgroundColor
+    this.renderingContext.fillStyle = "#000000"
+
+    const gradientArray = tinygradient("#4de36e", "#e4ea8a").hsv(4, 'short')
+    const gradients = gradientArray.map((color) => { return `#${color.toHex()}`})
+
+    const gradient = this.renderingContext.createLinearGradient(0, 0, this.canvas.width, this.canvas.height)
+    gradient.addColorStop(0, gradients[0]);
+    gradient.addColorStop(0.33, gradients[1]);
+    gradient.addColorStop(0.66, gradients[2]);
+    gradient.addColorStop(1, gradients[3]);
+    this.renderingContext.fillStyle = gradient
+
     this.renderingContext.fillRect(0, 0, this.canvas.width, this.canvas.height)
   }
 
