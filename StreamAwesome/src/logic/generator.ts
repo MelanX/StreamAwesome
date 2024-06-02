@@ -9,7 +9,6 @@ import { FontAwesomeIconType } from '@/model/fontAwesomeIconType'
 import { fontAwesomeVersionInfo } from '@/model/versions'
 import chroma from 'chroma-js'
 import namer from 'color-namer'
-import tinygradient from 'tinygradient'
 
 export default class IconGenerator {
   private renderingContext: CanvasRenderingContext2D
@@ -70,8 +69,15 @@ export default class IconGenerator {
     this.renderingContext.fillStyle = backgroundColor
     this.renderingContext.fillStyle = "#000000"
 
-    const gradientArray = tinygradient("#4de36e", "#e4ea8a").hsv(4, 'short')
-    const gradients = gradientArray.map((color) => { return `#${color.toHex()}`})
+    const shift = 60
+
+    const startColor = chroma(chroma(backgroundColor).get('hsl.h'), 0.8, 0.6, 'hsl').hex() 
+    const stopColorProto = chroma(startColor)
+    const stopColor = stopColorProto.set('hsl.h', (stopColorProto.get('hsl.h') + shift) % 360).hex()
+    const firstInBetween = chroma.mix(startColor, stopColor, 0.33, 'hsl').hex()
+    const secondInBetween = chroma.mix(startColor, stopColor, 0.66, 'hsl').hex()
+
+    const gradients = [startColor, firstInBetween, secondInBetween, stopColor]
 
     const gradient = this.renderingContext.createLinearGradient(0, 0, this.canvas.width, this.canvas.height)
     gradient.addColorStop(0, gradients[0]);
@@ -91,7 +97,7 @@ export default class IconGenerator {
 
     this.setupFont(icon.fontAwesomeIcon.unicode, icon.fontSize, fontWeight, fontFamilySuffix)
 
-    this.renderingContext.fillStyle = icon.foregroundColor
+    this.renderingContext.fillStyle = '#FFFFFF'
     this.renderingContext.fillText(iconCode, centerOfCanvas, centerOfCanvas)
 
     if (icon.fontAwesomeIcon.family === DuotoneKeyword && !icon.fontAwesomeIcon.isBrandsIcon) {
